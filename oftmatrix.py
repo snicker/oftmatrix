@@ -47,7 +47,7 @@ def index():
     return render_template('index.html')
             
 class WebServerThread(threading.Thread):
-    def __init__(self, port=9143):
+    def __init__(self, app, port=9143):
         super(WebServerThread,self).__init__()
         self.port = int(port)
         self.app = app
