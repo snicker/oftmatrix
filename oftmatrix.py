@@ -47,17 +47,17 @@ def highlight():
 def index():
     return render_template('index.html')
     
-@app.route('/effect/wave', method=['POST'])
+@app.route('/effect/wave', methods=['POST'])
 def effect_wave():
     waveeffect(4, 5, 100)
     return jsonify({'status': 'ok'})
     
-@app.route('/effect/party', method=['POST'])
+@app.route('/effect/party', methods=['POST'])
 def effect_party():
     partyeffect()
     return jsonify({'status': 'ok'})
     
-@app.route('/lights/all_off', method['POST'])
+@app.route('/lights/all_off', methods=['POST'])
 def lights_all_off():
     all_off()
     return jsonify({'status': 'ok'})
