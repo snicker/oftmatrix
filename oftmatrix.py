@@ -7,13 +7,6 @@ from bulbtricks.drivers.console import ConsoleDriver
 from bulbtricks.effects.highlighteffect import HighlightEffect
 from bulbtricks.bulbs.rampupbulb import RampUpBulb
 
-import argparse
-parser = argparse.ArgumentParser()
-parser.add_argument("--minbrightness", default=5, type=int)
-parser.add_argument("--maxbrightness", default=50,  type=int)
-parser.add_argument('--delay', default=4, type=int)
-args = parser.parse_args()
-
 oftmatrix = Matrix(10,5)
 try:
     from bulbtricks.drivers.olawebdriver import OLAWebDriver
@@ -22,7 +15,7 @@ try:
 except:
     print('failed to load OLAWebDriver')
 d = ConsoleDriver(oftmatrix)
-d.frequency = 30
+d.frequency = 15
 
 
 def waveeffect(delay, minbrightness, maxbrightness):
@@ -50,8 +43,13 @@ def highlight():
 @app.route('/')
 def index():
     return render_template('index.html')
+    
 
-oftmatrix.run()
-wd.run()
-waveeffect(4, 5, 100)
-app.run(debug=True, port=9143)
+def main():
+    oftmatrix.run()
+    wd.run()
+    waveeffect(4, 5, 100)
+    app.run(debug=True, port=9143)
+    
+if __name__ == '__main__':
+    main()
