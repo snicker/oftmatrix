@@ -5,6 +5,9 @@ import time
 
 from bulbtricks.matrix import Matrix
 from bulbtricks.effects.waveeffect import WaveEffect
+from bulbtricks.effects import EffectCycler
+from bulbtricks.effects.blinkeffect import BlinkColumnEffect
+from bulbtricks.effects.pulseeffect import PulseEffect
 from bulbtricks.drivers.console import ConsoleDriver
 from bulbtricks.effects.highlighteffect import HighlightEffect
 from bulbtricks.bulbs.rampupbulb import RampUpBulb
@@ -25,6 +28,21 @@ def waveeffect(delay, minbrightness, maxbrightness):
     effect = WaveEffect(delay = delay, minbrightness = (minbrightness + 0.0)/100, maxbrightness = (maxbrightness+0.0)/100)
     oftmatrix.remove_all_effects()
     oftmatrix.add_effect(effect)
+    
+def partyeffect():
+    cycler = EffectCycler()
+    cycler.add_effect(BlinkColumnEffect(), 4)
+    cycler.add_effect(BlinkColumnEffect(on_length=0.5, off_length=0.5), 2)
+    cycler.add_effect(BlinkColumnEffect(), 2)
+    cycler.add_effect(BlinkColumnEffect(), 4)
+    cycler.add_effect(BlinkColumnEffect(on_length=0.5, off_length=0.5), 2)
+    cycler.add_effect(BlinkColumnEffect(), 2)
+    cycler.add_effect(PulseEffect(minbrightness = 1.0/255))
+    cycler.add_effect(BlinkColumnEffect(on_length=0.5, off_length=0.5), 2)
+    cycler.add_effect(PulseEffect(minbrightness = 1.0/255))
+    cycler.add_effect(BlinkColumnEffect(on_length=0.5, off_length=0.5), 2)
+    oftmatrix.remove_all_effects()
+    oftmatrix.add_effect(cycler)
 
 
 def all_off():
