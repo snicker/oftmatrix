@@ -1,6 +1,7 @@
 from flask import Flask, render_template, redirect, request, abort
 app = Flask(__name__)
 import threading
+import time
 
 from bulbtricks.matrix import Matrix
 from bulbtricks.effects.waveeffect import WaveEffect
@@ -60,7 +61,7 @@ class WebServerThread(threading.Thread):
             if request.remote_addr == "127.0.0.1":
                 flask.request.environ.get('werkzeug.server.shutdown')()
             return abort(404)
-        app.run(port = self.port)
+        app.run(host='0.0.0.0', port = self.port)
     
     def stop_server(self, timeout=60):
         import requests
