@@ -5,7 +5,7 @@ import time
 
 from bulbtricks.matrix import Matrix
 from bulbtricks.effects.waveeffect import WaveEffect
-from bulbtricks.effects import EffectCycler
+from bulbtricks.effects.effect import EffectCycler
 from bulbtricks.effects.blinkeffect import BlinkColumnEffect
 from bulbtricks.effects.pulseeffect import PulseEffect
 from bulbtricks.drivers.console import ConsoleDriver
