@@ -1,4 +1,4 @@
-from flask import Flask, render_template, redirect, request, abort
+from flask import Flask, render_template, redirect, request, abort, jsonify
 app = Flask(__name__)
 import threading
 import time
@@ -46,6 +46,21 @@ def highlight():
 @app.route('/')
 def index():
     return render_template('index.html')
+    
+@app.route('/effect/wave', method=['POST'])
+def effect_wave():
+    waveeffect(4, 5, 100)
+    return jsonify({'status': 'ok'})
+    
+@app.route('/effect/party', method=['POST'])
+def effect_party():
+    partyeffect()
+    return jsonify({'status': 'ok'})
+    
+@app.route('/lights/all_off', method['POST'])
+def lights_all_off():
+    all_off()
+    return jsonify({'status': 'ok'})
             
 class WebServerThread(threading.Thread):
     def __init__(self, app, port=9143):

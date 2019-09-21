@@ -133,6 +133,26 @@ border-color:#9A8185;}
 }
 
 </style>
+<script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+<script>
+$(function() {
+	$("#waveon").click(function() {
+		$.post( "effect/wave", function( data ) {
+		  console.log(data);
+		});
+	});
+	$("#partyon").click(function() {
+		$.post( "effect/party", function( data ) {
+		  console.log(data);
+		});
+	});
+	$("#alloff").click(function() {
+		$.post( "lights/all_off", function( data ) {
+		  console.log(data);
+		});
+	});
+})
+</script>
 </head>
 
 <body>
@@ -155,19 +175,19 @@ border-color:#9A8185;}
 				<h2 class="title">Wave Effect</h2>
 
 				<div class="box-white">
-					<p><a href="/effect/wave">Turn On</a></p>
+					<p><a id="waveon" href="#">Turn On</a></p>
 				</div><!--box-white-->
 			
 				<h2 class="title">Party Mode</h2>
 
 				<div class="box-white">
-					<p><a href="/effect/wave">Turn On</a></p>
+					<p><a id="partyon" href="#">Turn On</a></p>
 				</div><!--box-white-->
 			
 				<h2 class="title">All Off</h2>
 
 				<div class="box-white">
-					<p><a href="/effect/wave">Turn All Lights Off</a></p>
+					<p><a id="alloff" href="#">Turn All Lights Off</a></p>
 				</div><!--box-white-->
 			
 				<!-- <h2 class="title2">Heading second</h2>
