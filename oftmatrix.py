@@ -92,7 +92,7 @@ class WebServerThread(threading.Thread):
         def stop_server():
             self.app.logger.info('request received from {} to stop webserver thread'.format(request.remote_addr))
             if request.remote_addr == "127.0.0.1":
-                flask.request.environ.get('werkzeug.server.shutdown')()
+                request.environ.get('werkzeug.server.shutdown')()
             return abort(404)
         app.run(host='0.0.0.0', port = self.port)
     
