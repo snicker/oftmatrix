@@ -77,7 +77,7 @@ class WebServerThread(threading.Thread):
 def main():
     logging.getLogger().setLevel(logging.INFO)
     wsthread = WebServerThread(app)
-    wsthread.run()
+    wsthread.start()
     oftmatrix.run()
     try:
         wd.run()
