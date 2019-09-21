@@ -6,6 +6,7 @@ from bulbtricks.effects.waveeffect import WaveEffect
 from bulbtricks.drivers.console import ConsoleDriver
 from bulbtricks.effects.highlighteffect import HighlightEffect
 from bulbtricks.bulbs.rampupbulb import RampUpBulb
+import logging
 
 oftmatrix = Matrix(10,5)
 try:
@@ -43,13 +44,55 @@ def highlight():
 @app.route('/')
 def index():
     return render_template('index.html')
+            
+class WebServerThread(threading.Thread):
+    def __init__(self, port=9143):
+        super(WebServerThread,self).__init__()
+        self.port = int(port)
+        self.app = app
+
+    def run_server(self, **kwargs):
+        logging.info('start server at: 127.0.0.1:%s' % self.port)
+        @self.app.route('/stopwebserver') #todo this route should probably be randomized and only known to the server itself to prevent unauthorized shutdown
+        def stop_server():
+            self.app.logger.info('request received from {} to stop webserver thread'.format(request.remote_addr))
+            if request.remote_addr == "127.0.0.1":
+                flask.request.environ.get('werkzeug.server.shutdown')()
+            return abort(404)
+        app.run(port = self.port)
+    
+    def stop_server(self, timeout=60):
+        import requests
+        try:
+            requests.get('http://127.0.0.1:{}/stopwebserver'.format(self.port))
+        except:
+            pass
+
+    def run(self):
+        self.run_server()
     
 
 def main():
+    logging.getLogger().setLevel(logging.INFO)
+    wsthread = WebServerThread(app)
+    wsthread.run()
     oftmatrix.run()
-    wd.run()
+    try:
+        wd.run()
+    except:
+        pass
     waveeffect(4, 5, 100)
-    app.run(debug=True, port=9143)
+    try:
+        while 1:
+            time.sleep(1)
+    except KeyboardInterrupt:
+        logging.info("shutdown has been initiated from the console...")
+        oftmatrix.stop()
+        try:
+            wd.stop()
+        except:
+            pass
+        wsthread.stop_server()
     
 if __name__ == '__main__':
     main()
