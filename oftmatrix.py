@@ -1,4 +1,4 @@
-from flask import render_template, redirect, request, abort
+from flask import Flask, render_template, redirect, request, abort
 app = Flask(__name__)
 
 from bulbtricks.matrix import Matrix
