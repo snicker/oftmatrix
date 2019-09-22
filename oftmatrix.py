@@ -63,7 +63,7 @@ def highlight():
 ####web
 @app.route('/')
 def index():
-    return render_template('index.html')
+    return render_template('index.html', **{'matrix': oftmatrix})
     
 @app.route('/effect/wave', methods=['POST'])
 def effect_wave():
@@ -79,6 +79,16 @@ def effect_party():
 def lights_all_off():
     all_off()
     return jsonify({'status': 'ok'})
+    
+@app.route('/speed/<direction>', methods=['POST'])
+def lights_all_off(direction):
+    if direction in ('up','down'):
+        dmod = 1
+        if direction == 'down':
+            dmod = -1
+        oftmatrix._speed = oftmatrix._speed + (0.1 * dmod)
+        return jsonify({'status': 'ok', 'speed': oftmatrix._speed})
+    return jsonify({'status': 'fail'})
             
 class WebServerThread(threading.Thread):
     def __init__(self, app, port=9143):

@@ -151,6 +151,18 @@ $(function() {
 		  console.log(data);
 		});
 	});
+	$("#speed_up").click(function() {
+		$.post( "speed/up", function( data ) {
+		  console.log(data);
+		  $('#current_speed').innertext = data.speed * 100
+		});
+	});
+	$("#speed_up").click(function() {
+		$.post( "speed/down", function( data ) {
+		  console.log(data);
+		  $('#current_speed').innertext = data.speed * 100
+		});
+	});
 })
 </script>
 </head>
@@ -189,6 +201,17 @@ $(function() {
 				<div class="box-white">
 					<p><a id="alloff" href="#">Turn All Lights Off</a></p>
 				</div><!--box-white-->
+				
+				<h2 class="title">Options</h2>
+				
+				<table>
+					<thead>
+						<tr><th>Option</th><th>Value</th><th>Up</th><th>Down</th></tr>
+					</thead>
+					<tbody>
+						<tr><td>Speed</td><td><span id="current_speed">{{ matrix._speed * 100 }}</span>%</td><td><a id="speed_up" href="#">Up</a></td><td><a id="speed_down" href="#">Down</a></td></tr>
+					</tbody>
+				</table>
 			
 				<!-- <h2 class="title2">Heading second</h2>
 				
