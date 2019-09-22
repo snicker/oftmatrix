@@ -81,7 +81,7 @@ def lights_all_off():
     return jsonify({'status': 'ok'})
     
 @app.route('/speed/<direction>', methods=['POST'])
-def lights_all_off(direction):
+def change_speed(direction):
     if direction in ('up','down'):
         dmod = 1
         if direction == 'down':
