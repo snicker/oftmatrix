@@ -140,28 +140,33 @@ $(function() {
 		$.post( "effect/wave", function( data ) {
 		  console.log(data);
 		});
+		return false
 	});
 	$("#partyon").click(function() {
 		$.post( "effect/party", function( data ) {
 		  console.log(data);
 		});
+		return false
 	});
 	$("#alloff").click(function() {
 		$.post( "lights/all_off", function( data ) {
 		  console.log(data);
 		});
+		return false
 	});
 	$("#speed_up").click(function() {
 		$.post( "speed/up", function( data ) {
 		  console.log(data);
-		  $('#current_speed').innertext = data.speed * 100
+		  $('#current_speed').text(data.speed)
 		});
+		return false
 	});
 	$("#speed_down").click(function() {
 		$.post( "speed/down", function( data ) {
 		  console.log(data);
-		  $('#current_speed').innertext = data.speed * 100
+		  $('#current_speed').text(data.speed)
 		});
+		return false
 	});
 })
 </script>

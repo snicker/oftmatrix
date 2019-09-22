@@ -87,7 +87,7 @@ def change_speed(direction):
         if direction == 'down':
             dmod = -1
         oftmatrix._speed = oftmatrix._speed + (0.1 * dmod)
-        return jsonify({'status': 'ok', 'speed': oftmatrix._speed})
+        return jsonify({'status': 'ok', 'speed': str(int(oftmatrix._speed*100))})
     return jsonify({'status': 'fail'})
             
 class WebServerThread(threading.Thread):
