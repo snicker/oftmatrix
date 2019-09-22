@@ -157,7 +157,7 @@ $(function() {
 		  $('#current_speed').innertext = data.speed * 100
 		});
 	});
-	$("#speed_up").click(function() {
+	$("#speed_down").click(function() {
 		$.post( "speed/down", function( data ) {
 		  console.log(data);
 		  $('#current_speed').innertext = data.speed * 100
