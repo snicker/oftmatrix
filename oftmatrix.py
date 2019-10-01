@@ -83,8 +83,8 @@ EFFECTS = {
 
 def activate_effect(effect, parameters={}):
     if effect in EFFECTS:
-        EFFECTS[effect](**parameters)
         set_current_effect(effect, parameters)
+        on()
 
 def off():
     set_status(0)
@@ -194,6 +194,7 @@ def main():
     wsthread = WebServerThread(app)
     wsthread.start()
     CONFIG = load_config()
+    logging.info('config loaded {}'.format(CONFIG))
     oftmatrix.run()
     try:
         wd.run()
