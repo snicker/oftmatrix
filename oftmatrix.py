@@ -115,9 +115,9 @@ def on():
     if not current_effect:
         current_effect = {
             'name': 'none',
-            'parameters': {'brightness': 100}
+            'params': {'brightness': 100}
         }
-    activate_effect(current_effect.get('name'), current_effect.get('parameters',{}))
+    activate_effect(current_effect.get('name'), current_effect.get('params',{}))
 
 def highlight():
     he = HighlightEffect(5, 3, minbrightnessmodifier = 0, delay = 10)
