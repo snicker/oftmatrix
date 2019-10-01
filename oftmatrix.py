@@ -194,6 +194,7 @@ def main():
     logging.getLogger().setLevel(logging.INFO)
     wsthread = WebServerThread(app)
     wsthread.start()
+    global CONFIG
     CONFIG = load_config()
     logging.info('config loaded {}'.format(CONFIG))
     oftmatrix.run()
