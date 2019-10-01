@@ -41,7 +41,21 @@ def save_config(config):
             pickle.dump(config, f)
     except:
         pass
-
+ 
+        
+def set_current_effect(effect, parameters):
+    CONFIG['current_effect'] = {'name': effect, 'params': parameters}
+    save_config(CONFIG)
+    
+def set_status(status):
+    CONFIG['status'] = status
+    save_config(CONFIG)
+    
+def set_speed(speed):
+    CONFIG['speed'] = speed
+    oftmatrix._speed = speed
+    save_config(CONFIG)
+    
 def waveeffect(delay, minbrightness, maxbrightness):
     effect = WaveEffect(delay = delay, minbrightness = (minbrightness + 0.0)/100, maxbrightness = (maxbrightness+0.0)/100)
     oftmatrix.remove_all_effects()
@@ -61,9 +75,19 @@ def partyeffect():
     cycler.add_effect(BlinkColumnEffect(on_length=0.5, off_length=0.5), 2)
     oftmatrix.remove_all_effects()
     oftmatrix.add_effect(cycler)
+       
+EFFECTS = {
+    "wave_effect": waveeffect,
+    "party_mode": partyeffect
+}
 
+def activate_effect(effect, parameters={}):
+    if effect in EFFECTS:
+        EFFECTS[effect](**parameters)
+        set_current_effect(effect, parameters)
 
-def all_off():
+def off():
+    set_status(0)
     oftmatrix.remove_all_effects()
     for col in range(oftmatrix.columns):
         for row in range(oftmatrix.rows):
@@ -72,7 +96,16 @@ def all_off():
             rdbulb.backward()
             rdbulb.brightness = cbulb.brightness
             oftmatrix.add(rdbulb, col, row)
-
+            
+def on():
+    set_status(1)
+    current_effect = CONFIG.get('current_effect')
+    if not current_effect:
+        current_effect = {
+            'name': wave_effect,
+            'parameters': {'delay': 4, 'minbrightness': 5, 'maxbrightness': 80}
+        }
+    activate_effect(current_effect.get('name'), current_effect.get('parameters'))
 
 def highlight():
     he = HighlightEffect(5, 3, minbrightnessmodifier = 0, delay = 10)
@@ -88,18 +121,18 @@ def effect_wave(brightness):
     try:
         brightness = int(brightness)
     except:
-        brightness = 1
-    waveeffect(4, 5, brightness)
+        brightness = 100
+    activate_effect('wave_effect', {'delay': 4, 'minbrightness': 5, 'maxbrightness':brightness})
     return jsonify({'status': 'ok'})
     
 @app.route('/effect/party', methods=['POST'])
 def effect_party():
-    partyeffect()
+    activate_effect('party_mode')
     return jsonify({'status': 'ok'})
     
 @app.route('/lights/all_off', methods=['POST'])
 def lights_all_off():
-    all_off()
+    off()
     return jsonify({'status': 'ok'})
     
 @app.route('/speed/<direction>', methods=['POST'])
@@ -108,9 +141,14 @@ def change_speed(direction):
         dmod = 1
         if direction == 'down':
             dmod = -1
-        oftmatrix._speed = oftmatrix._speed + (0.1 * dmod)
+        set_speed(oftmatrix._speed + (0.1 * dmod))
         return jsonify({'status': 'ok', 'speed': str(int(oftmatrix._speed*100))})
     return jsonify({'status': 'fail'})
+    
+def initialize_matrix()
+    set_speed(CONFIG.get('speed',1))
+    if CONFIG.get('status'):
+        on()
             
 class WebServerThread(threading.Thread):
     def __init__(self, app, port=9143):
@@ -149,7 +187,7 @@ def main():
         wd.run()
     except:
         pass
-    waveeffect(4, 5, 100)
+    initialize_matrix()
     try:
         while 1:
             time.sleep(1)
