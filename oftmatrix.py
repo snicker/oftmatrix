@@ -12,6 +12,8 @@ from bulbtricks.drivers.console import ConsoleDriver
 from bulbtricks.effects.highlighteffect import HighlightEffect
 from bulbtricks.bulbs.rampupbulb import RampUpBulb
 import logging
+import pickle
+import os
 
 oftmatrix = Matrix(10,5)
 try:
@@ -23,6 +25,22 @@ except:
 d = ConsoleDriver(oftmatrix)
 d.frequency = 15
 
+CONFIG = {}
+
+def load_config():
+    try:
+        with open('oftmatrix.conf.pkl','r') as f:
+            return pickle.load(f)
+    except:
+        pass
+    return {}
+        
+def save_config(config):
+    try:
+        with open('oftmatrix.conf.pkl','wb') as f:
+            pickle.dump(config, f)
+    except:
+        pass
 
 def waveeffect(delay, minbrightness, maxbrightness):
     effect = WaveEffect(delay = delay, minbrightness = (minbrightness + 0.0)/100, maxbrightness = (maxbrightness+0.0)/100)
@@ -115,12 +133,13 @@ class WebServerThread(threading.Thread):
 
     def run(self):
         self.run_server()
-    
+        
 
 def main():
     logging.getLogger().setLevel(logging.INFO)
     wsthread = WebServerThread(app)
     wsthread.start()
+    CONFIG = load_config()
     oftmatrix.run()
     try:
         wd.run()
