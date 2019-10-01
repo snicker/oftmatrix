@@ -156,7 +156,7 @@ def get_matrix():
                 pass
     return jsonify({'matrix': _matrix})
     
-def initialize_matrix()
+def initialize_matrix():
     set_speed(CONFIG.get('speed',1))
     if CONFIG.get('status'):
         on()
