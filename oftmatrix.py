@@ -106,7 +106,7 @@ def on():
             'name': wave_effect,
             'parameters': {'delay': 4, 'minbrightness': 5, 'maxbrightness': 80}
         }
-    activate_effect(current_effect.get('name'), current_effect.get('parameters'))
+    activate_effect(current_effect.get('name'), current_effect.get('parameters',{}))
 
 def highlight():
     he = HighlightEffect(5, 3, minbrightnessmodifier = 0, delay = 10)
