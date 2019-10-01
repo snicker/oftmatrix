@@ -134,7 +134,7 @@ def control_get_state():
     
 @app.route('/control/state', methods = ['POST'])
 def control_set_state():
-    data = (request.data or '').lower().strip()
+    data = str(request.data or '','utf-8').lower().strip()
     if data == 'on':
         on()
     if data == 'off':
