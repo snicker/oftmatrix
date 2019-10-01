@@ -128,6 +128,19 @@ def highlight():
 def index():
     return render_template('index.html', **{'matrix': oftmatrix})
     
+@app.route('/control/state', methods = ['GET'])
+def control_get_state():
+    return 'ON' if CONFIG.get('status') else 'OFF'
+    
+@app.route('/control/state', methods = ['POST'])
+def control_set_state():
+    data = (request.data or '').lower().strip()
+    if data == 'on':
+        on()
+    if data == 'off':
+        off()
+    return control_get_state()
+    
 @app.route('/effect/wave/<brightness>', methods=['POST'])
 def effect_wave(brightness):
     try:
