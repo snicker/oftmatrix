@@ -83,8 +83,9 @@ EFFECTS = {
 
 def activate_effect(effect, parameters={}):
     if effect in EFFECTS:
+        EFFECTS[effect](**parameters)
         set_current_effect(effect, parameters)
-        on()
+        set_status(1)
 
 def off():
     set_status(0)
