@@ -83,9 +83,13 @@ def highlight():
 def index():
     return render_template('index.html', **{'matrix': oftmatrix})
     
-@app.route('/effect/wave', methods=['POST'])
-def effect_wave():
-    waveeffect(4, 5, 100)
+@app.route('/effect/wave/<brightness>', methods=['POST'])
+def effect_wave(brightness):
+    try:
+        brightness = int(brightness)
+    except:
+        brightness = 1
+    waveeffect(4, 5, brightness)
     return jsonify({'status': 'ok'})
     
 @app.route('/effect/party', methods=['POST'])
