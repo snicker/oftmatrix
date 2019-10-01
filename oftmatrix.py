@@ -153,7 +153,7 @@ def get_matrix():
             try:
                 _matrix[col][row] = int(oftmatrix.at(col,row).brightness * 100)
             except:
-                pass
+                logging.exception('could not populate matrix')
     return jsonify({'matrix': _matrix})
     
 def initialize_matrix():
