@@ -137,11 +137,17 @@ border-color:#9A8185;}
 <script>
 $(function() {
 	$("#waveon").click(function() {
-		$.post( "effect/wave", function( data ) {
+		$.post( "effect/wave/100", function( data ) {
 		  console.log(data);
 		});
 		return false
 	});
+    $("#waveon_low").click(function() {
+      $.post("effect/wave/30", function(data){
+        console.log(data);
+      });
+      return false;
+    });
 	$("#partyon").click(function() {
 		$.post( "effect/party", function( data ) {
 		  console.log(data);
@@ -193,7 +199,9 @@ $(function() {
 
 				<div class="box-white">
 					<p><a id="waveon" href="#">Turn On</a></p>
-				</div><!--box-white-->
+                   <p><a id="waveon_low" href="#">Turn on low
+                     brightness</a></p>
+                </div><!--box-white-->
 			
 				<h2 class="title">Party Mode</h2>
 
