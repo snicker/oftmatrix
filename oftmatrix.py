@@ -11,6 +11,7 @@ from bulbtricks.effects.pulseeffect import PulseEffect
 from bulbtricks.drivers.console import ConsoleDriver
 from bulbtricks.effects.highlighteffect import HighlightEffect
 from bulbtricks.bulbs.rampupbulb import RampUpBulb
+from bulbtricks.bulbs.bulb import Bulb
 import logging
 import pickle
 import os
@@ -75,10 +76,20 @@ def partyeffect():
     cycler.add_effect(BlinkColumnEffect(on_length=0.5, off_length=0.5), 2)
     oftmatrix.remove_all_effects()
     oftmatrix.add_effect(cycler)
+    
+def noeffect(brightness=100):
+    oftmatrix.remove_all_effects()
+    for col in range(oftmatrix.columns):
+        for row in range(oftmatrix.rows):
+            rdbulb = Bulb()
+            rdbulb.brightness = brightness/100.0
+            oftmatrix.add(rdbulb, col, row)
+    
        
 EFFECTS = {
     "wave_effect": waveeffect,
-    "party_mode": partyeffect
+    "party_mode": partyeffect,
+    "none": noeffect
 }
 
 def activate_effect(effect, parameters={}):
@@ -103,8 +114,8 @@ def on():
     current_effect = CONFIG.get('current_effect')
     if not current_effect:
         current_effect = {
-            'name': wave_effect,
-            'parameters': {'delay': 4, 'minbrightness': 5, 'maxbrightness': 80}
+            'name': 'none',
+            'parameters': {'brightness': 100}
         }
     activate_effect(current_effect.get('name'), current_effect.get('parameters',{}))
 
@@ -148,7 +159,7 @@ def change_speed(direction):
     
 @app.route('/matrix', methods=['GET'])
 def get_matrix():
-    _matrix = [ [None for x in range(0, oftmatrix.rows)] for y in range(0, oftmatrix.columns) ]
+    _matrix = [ [0 for x in range(0, oftmatrix.rows)] for y in range(0, oftmatrix.columns) ]
     for row in range(oftmatrix.rows):
         for col in range(oftmatrix.columns):
             try:
