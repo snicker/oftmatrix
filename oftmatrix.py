@@ -145,6 +145,17 @@ def change_speed(direction):
         return jsonify({'status': 'ok', 'speed': str(int(oftmatrix._speed*100))})
     return jsonify({'status': 'fail'})
     
+@app.route('/matrix', methods=['GET'])
+def get_matrix():
+    _matrix = [ [None for x in range(0, oftmatrix.rows)] for y in range(0, oftmatrix.columns) ]
+    for row in range(oftmatrix.rows):
+        for col in range(oftmatrix.columns):
+            try:
+                _matrix[col][row] = int(self.matrix.at(col,row).brightness * 100)
+            except:
+                pass
+    return jsonify({'matrix': _matrix})
+    
 def initialize_matrix()
     set_speed(CONFIG.get('speed',1))
     if CONFIG.get('status'):
