@@ -29,7 +29,7 @@ CONFIG = {}
 
 def load_config():
     try:
-        with open('oftmatrix.conf.pkl','r') as f:
+        with open('oftmatrix.conf.pkl','rb') as f:
             return pickle.load(f)
     except:
         pass
@@ -153,13 +153,14 @@ def get_matrix():
             try:
                 _matrix[col][row] = int(oftmatrix.at(col,row).brightness * 100)
             except:
-                logging.exception('could not populate matrix')
+                pass
     return jsonify({'matrix': _matrix})
     
 def initialize_matrix():
     set_speed(CONFIG.get('speed',1))
     if CONFIG.get('status'):
         on()
+    oftmatrix.run()
             
 class WebServerThread(threading.Thread):
     def __init__(self, app, port=9143):
