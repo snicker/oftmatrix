@@ -16,6 +16,14 @@ import logging
 import pickle
 import os
 
+class OFTMatrix(Matrix):
+    def __init__(self, *args, **kwargs):
+        Matrix.__init__(self, *args, **kwargs)
+        self.brightness = 1.0
+        
+    def brightness_at(self, column, row):
+        return Matrix.brightness_at(self, column, row) * self.brightness
+
 oftmatrix = Matrix(10,5)
 try:
     from bulbtricks.drivers.olawebdriver import OLAWebDriver
@@ -55,6 +63,11 @@ def set_status(status):
 def set_speed(speed):
     CONFIG['speed'] = speed
     oftmatrix._speed = speed
+    save_config(CONFIG)
+    
+def set_brightness(brightness):
+    CONFIG['brightness'] = brightness
+    oftmatrix.brightness = brightness
     save_config(CONFIG)
     
 def waveeffect(delay, minbrightness, maxbrightness):
@@ -140,6 +153,21 @@ def control_set_state():
     if data == 'off':
         off()
     return control_get_state()
+    
+@app.route('/control/brightness', methods = ['GET'])
+def control_get_brightness():
+    return int(oftmatrix.brightness * 255.0)
+    
+@app.route('/control/brightness', methods = ['POST'])
+def control_set_brightness():
+    brightness = -1
+    try:
+        brightness = max(0,min(255,int(str(request.data or '','utf-8'))))
+    except:
+        pass
+    if brightness > -1:
+        set_brightness(brightness / 255.0)
+    return control_get_brightness()
     
 @app.route('/effect/wave/<brightness>', methods=['POST'])
 def effect_wave(brightness):
