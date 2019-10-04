@@ -24,7 +24,7 @@ class OFTMatrix(Matrix):
     def brightness_at(self, column, row):
         return Matrix.brightness_at(self, column, row) * self.brightness
 
-oftmatrix = Matrix(10,5)
+oftmatrix = OFTMatrix(10,5)
 try:
     from bulbtricks.drivers.olawebdriver import OLAWebDriver
     wd = OLAWebDriver(oftmatrix)
