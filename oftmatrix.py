@@ -70,7 +70,7 @@ def set_brightness(brightness):
     oftmatrix.brightness = brightness
     save_config(CONFIG)
     
-def waveeffect(delay, minbrightness, maxbrightness):
+def waveeffect(delay = 5, minbrightness= 5, maxbrightness=100):
     effect = WaveEffect(delay = delay, minbrightness = (minbrightness + 0.0)/100, maxbrightness = (maxbrightness+0.0)/100)
     oftmatrix.remove_all_effects()
     oftmatrix.add_effect(effect)
@@ -168,6 +168,17 @@ def control_set_brightness():
     if brightness > -1:
         set_brightness(brightness / 255.0)
     return control_get_brightness()
+    
+@app.route('/control/effect', methods = ['GET'])
+def control_get_effect():
+    return CONFIG.get('current_effect',{}).get('name','none')
+    
+@app.route('/control/effect', methods = ['POST'])
+def control_set_effect():
+    effect = str(request.data or '','utf-8')
+    if effect in EFFECTS:
+        activate_effect(effect)
+    return control_get_effect()
     
 @app.route('/effect/wave/<brightness>', methods=['POST'])
 def effect_wave(brightness):
