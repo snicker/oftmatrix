@@ -156,7 +156,7 @@ def control_set_state():
     
 @app.route('/control/brightness', methods = ['GET'])
 def control_get_brightness():
-    return int(oftmatrix.brightness * 255.0)
+    return str(int(oftmatrix.brightness * 255.0))
     
 @app.route('/control/brightness', methods = ['POST'])
 def control_set_brightness():
