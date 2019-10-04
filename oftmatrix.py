@@ -204,7 +204,7 @@ def get_matrix():
     for row in range(oftmatrix.rows):
         for col in range(oftmatrix.columns):
             try:
-                _matrix[col][row] = int(oftmatrix.at(col,row).brightness * 100)
+                _matrix[col][row] = int(oftmatrix.brightness_at(col,row) * 100)
             except:
                 pass
     return jsonify({'matrix': _matrix})
