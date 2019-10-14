@@ -314,7 +314,7 @@ class BufferingMailgunHandler(logging.handlers.BufferingHandler):
                 request = requests.post(request_url, auth=('api', key), data={
                     'from': self.fromaddr,
                     'to': string.join(self.toaddrs, ","),
-                    'subject': subject,
+                    'subject': self.subject,
                     'text': msg
                 })
             except:
