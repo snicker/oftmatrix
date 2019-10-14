@@ -290,10 +290,9 @@ mainConsoleHandler.setFormatter(mainLogFormatter)
 logdir = "./logs/"
 
 class BufferingSMTPHandler(logging.handlers.BufferingHandler):
-    def __init__(self, mailhost, fromaddr, toaddrs, subject, capacity):
+    def __init__(self, smtpconfig, fromaddr, toaddrs, subject, capacity):
         logging.handlers.BufferingHandler.__init__(self, capacity)
-        self.mailhost = mailhost
-        self.mailport = None
+        self.smtpconfig = smtpconfig
         self.fromaddr = fromaddr
         self.toaddrs = toaddrs
         self.subject = subject
@@ -306,7 +305,9 @@ class BufferingSMTPHandler(logging.handlers.BufferingHandler):
                 port = self.mailport
                 if not port:
                     port = smtplib.SMTP_PORT
-                smtp = smtplib.SMTP(self.mailhost, port)
+                smtp = smtplib.SMTP(self.smtpconfig.get('host'), self.smtpconfig.get('port'))
+                if self.smtpconfig.get('username'):
+                    smtp.login(self.smtpconfig.get('username'), self.smtpconfig.get('password'))
                 msg = "From: %s\r\nTo: %s\r\nSubject: %s\r\n\r\n" % (self.fromaddr, string.join(self.toaddrs, ","), self.subject)
                 for record in self.buffer:
                     s = self.format(record)
@@ -337,7 +338,7 @@ def configure_log(logdir=logdir,level=logging.WARNING,name=None):
         smtpHandler = BufferingSMTPHandler(
             toaddrs=alertemails,
             fromaddr=config.get('logging','error_fromaddr'),
-            mailhost=config.get('logging','mailhost'),
+            smtpconfig=config.get('logging','smtpconfig'),
             subject="Error in OFTMatrix",
             capacity=10)
         smtpHandler.setFormatter(mainLogFormatter)
