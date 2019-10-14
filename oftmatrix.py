@@ -310,7 +310,7 @@ class BufferingMailgunHandler(logging.handlers.BufferingHandler):
                 for record in self.buffer:
                     s = self.format(record)
                     msg = msg + s + "\r\n"
-                request_url = 'https://api.mailgun.net/v2/{0}/messages'.format(domain)
+                request_url = 'https://api.mailgun.net/v3/{0}/messages'.format(domain)
                 request = requests.post(request_url, auth=('api', key), data={
                     'from': self.fromaddr,
                     'to': string.join(self.toaddrs, ","),
