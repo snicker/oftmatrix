@@ -17,6 +17,7 @@ import logging
 import logging.handlers
 import pickle
 import os
+import sys
 
 def installThreadExcepthook():
     """
