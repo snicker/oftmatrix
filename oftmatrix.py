@@ -303,10 +303,10 @@ class BufferingSMTPHandler(logging.handlers.BufferingHandler):
         if len(self.buffer) > 0:
             try:
                 import smtplib
-                port = self.mailport
+                port = self.smtpconfig.get('port')
                 if not port:
                     port = smtplib.SMTP_PORT
-                smtp = smtplib.SMTP(self.smtpconfig.get('host'), self.smtpconfig.get('port'))
+                smtp = smtplib.SMTP(self.smtpconfig.get('host'), port)
                 if self.smtpconfig.get('username'):
                     smtp.login(self.smtpconfig.get('username'), self.smtpconfig.get('password'))
                 msg = "From: %s\r\nTo: %s\r\nSubject: %s\r\n\r\n" % (self.fromaddr, string.join(self.toaddrs, ","), self.subject)
