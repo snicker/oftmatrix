@@ -309,7 +309,6 @@ class BufferingSMTPHandler(logging.handlers.BufferingHandler):
                 msg = "From: %s\r\nTo: %s\r\nSubject: %s\r\n\r\n" % (self.fromaddr, string.join(self.toaddrs, ","), self.subject)
                 for record in self.buffer:
                     s = self.format(record)
-                    print s
                     msg = msg + s + "\r\n"
                 smtp.sendmail(self.fromaddr, self.toaddrs, msg)
                 smtp.quit()
@@ -337,7 +336,7 @@ def configure_log(logdir=logdir,level=logging.WARNING,name=None):
         smtpHandler = BufferingSMTPHandler(
             toaddrs=alertemails,
             fromaddr=config.get('logging','error_fromaddr'),
-            mailhost=config.get('logging','mailhost')
+            mailhost=config.get('logging','mailhost'),
             subject="Error in OFTMatrix",
             capacity=10)
         smtpHandler.setFormatter(mainLogFormatter)
