@@ -355,6 +355,7 @@ def main():
             raise ValueError('Invalid log level: %s' % loglevel)
         loglevel = numeric_level
     configure_log(level=loglevel)
+    configure_log(name="werkzeug", level=logging.INFO)
     
     installThreadExcepthook()
     
