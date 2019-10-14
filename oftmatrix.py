@@ -12,9 +12,35 @@ from bulbtricks.drivers.console import ConsoleDriver
 from bulbtricks.effects.highlighteffect import HighlightEffect
 from bulbtricks.bulbs.rampupbulb import RampUpBulb
 from bulbtricks.bulbs.bulb import Bulb
+from configreader import ConfigReader
 import logging
 import pickle
 import os
+
+def installThreadExcepthook():
+    """
+    Workaround for sys.excepthook thread bug
+    From
+    http://spyced.blogspot.com/2007/06/workaround-for-sysexcepthook-bug.html
+       
+    (https://sourceforge.net/tracker/?func=detail&atid=105470&aid=1230540&group_id=5470).
+    Call once from __main__ before creating any threads.
+    If using psyco, call psyco.cannotcompile(threading.Thread.run)
+    since this replaces a new-style class method.
+    """
+    init_old = threading.Thread.__init__
+    def init(self, *args, **kwargs):
+        init_old(self, *args, **kwargs)
+        run_old = self.run
+        def run_with_except_hook(*args, **kw):
+            try:
+                run_old(*args, **kw)
+            except (KeyboardInterrupt, SystemExit):
+                raise
+            except:
+                sys.excepthook(*sys.exc_info())
+        self.run = run_with_except_hook
+    threading.Thread.__init__ = init
 
 class OFTMatrix(Matrix):
     def __init__(self, *args, **kwargs):
@@ -250,11 +276,91 @@ class WebServerThread(threading.Thread):
             pass
 
     def run(self):
-        self.run_server()
+        try:
+            self.run_server()
+        except (KeyboardInterrupt, SystemExit):
+            raise
+        except:
+            sys.excepthook(*sys.exc_info())
         
+mainLogFormatter = logging.Formatter("%(asctime)s [%(levelname)s]: (%(name)s) %(message)s")
+mainConsoleHandler = logging.StreamHandler()
+mainConsoleHandler.setFormatter(mainLogFormatter)
+logdir = "./logs/"
+
+class BufferingSMTPHandler(logging.handlers.BufferingHandler):
+    def __init__(self, mailhost, fromaddr, toaddrs, subject, capacity):
+        logging.handlers.BufferingHandler.__init__(self, capacity)
+        self.mailhost = mailhost
+        self.mailport = None
+        self.fromaddr = fromaddr
+        self.toaddrs = toaddrs
+        self.subject = subject
+        self.setFormatter(logging.Formatter("%(asctime)s %(levelname)-5s %(message)s"))
+
+    def flush(self):
+        if len(self.buffer) > 0:
+            try:
+                import smtplib
+                port = self.mailport
+                if not port:
+                    port = smtplib.SMTP_PORT
+                smtp = smtplib.SMTP(self.mailhost, port)
+                msg = "From: %s\r\nTo: %s\r\nSubject: %s\r\n\r\n" % (self.fromaddr, string.join(self.toaddrs, ","), self.subject)
+                for record in self.buffer:
+                    s = self.format(record)
+                    print s
+                    msg = msg + s + "\r\n"
+                smtp.sendmail(self.fromaddr, self.toaddrs, msg)
+                smtp.quit()
+            except:
+                self.handleError(None)  # no particular record
+            self.buffer = []
+
+def configure_log(logdir=logdir,level=logging.WARNING,name=None):
+    logger = logging.getLogger(name)
+    for hdlr in logger.handlers[:]:
+        logger.removeHandler(hdlr)
+    logger.setLevel(level)
+    logger.propagate = False
+    logging.getLogger("requests").setLevel(logging.CRITICAL)
+    filename = "oftmatrix.log"
+    if name is not None:
+        filename = "oftmatrix.{}.log".format(name)  
+    fileHandler = logging.FileHandler(filename=os.path.join(logdir, filename))
+    fileHandler.setFormatter(mainLogFormatter)
+    logger.addHandler(fileHandler)
+    logger.addHandler(mainConsoleHandler)
+    config = ConfigReader()
+    alertemails = config.get('logging','error_alertemails')
+    if len(alertemails) > 0:
+        smtpHandler = BufferingSMTPHandler(
+            toaddrs=alertemails,
+            fromaddr=config.get('logging','error_fromaddr'),
+            mailhost=config.get('logging','mailhost')
+            subject="Error in OFTMatrix",
+            capacity=10)
+        smtpHandler.setFormatter(mainLogFormatter)
+        smtpHandler.setLevel(logging.ERROR)
+        logger.addHandler(smtpHandler)
 
 def main():
-    logging.getLogger().setLevel(logging.INFO)
+    config = ConfigReader()
+    loglevel = logging.INFO
+    if config.get("logging","loglevel"):
+        numeric_level = getattr(logging, config.get("logging","loglevel").upper(), None)
+        if not isinstance(numeric_level, int):
+            raise ValueError('Invalid log level: %s' % loglevel)
+        loglevel = numeric_level
+    configure_log(level=loglevel)
+    
+    installThreadExcepthook()
+    
+    def uncaught_exception_handler(exc_type, exc_value, exc_traceback):
+        logging.info('haha wtf {}'.format(exc_traceback))
+        logging.error("Uncaught exception", exc_info=(exc_type, exc_value, exc_traceback))
+    sys.excepthook = uncaught_exception_handler
+    
     wsthread = WebServerThread(app)
     wsthread.start()
     global CONFIG
