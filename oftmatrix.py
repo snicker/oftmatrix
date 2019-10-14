@@ -313,7 +313,7 @@ class BufferingMailgunHandler(logging.handlers.BufferingHandler):
                 request_url = 'https://api.mailgun.net/v3/{0}/messages'.format(domain)
                 request = requests.post(request_url, auth=('api', key), data={
                     'from': self.fromaddr,
-                    'to': string.join(self.toaddrs, ","),
+                    'to': ",".join(self.toaddrs),
                     'subject': self.subject,
                     'text': msg
                 })
