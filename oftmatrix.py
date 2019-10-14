@@ -290,10 +290,10 @@ mainConsoleHandler = logging.StreamHandler()
 mainConsoleHandler.setFormatter(mainLogFormatter)
 logdir = "./logs/"
 
-class BufferingSMTPHandler(logging.handlers.BufferingHandler):
-    def __init__(self, smtpconfig, fromaddr, toaddrs, subject, capacity):
+class BufferingMailgunHandler(logging.handlers.BufferingHandler):
+    def __init__(self, mailgunconfig, fromaddr, toaddrs, subject, capacity):
         logging.handlers.BufferingHandler.__init__(self, capacity)
-        self.smtpconfig = smtpconfig
+        self.mailgunconfig = mailgunconfig
         self.fromaddr = fromaddr
         self.toaddrs = toaddrs
         self.subject = subject
@@ -302,19 +302,21 @@ class BufferingSMTPHandler(logging.handlers.BufferingHandler):
     def flush(self):
         if len(self.buffer) > 0:
             try:
-                import smtplib
-                port = self.smtpconfig.get('port')
-                if not port:
-                    port = smtplib.SMTP_PORT
-                smtp = smtplib.SMTP(self.smtpconfig.get('host'), port)
-                if self.smtpconfig.get('username'):
-                    smtp.login(self.smtpconfig.get('username'), self.smtpconfig.get('password'))
+                import requests
+                key = self.mailgunconfig.get('apikey')
+                domain = self.mailgunconfig.get('domain')
+
                 msg = "From: %s\r\nTo: %s\r\nSubject: %s\r\n\r\n" % (self.fromaddr, string.join(self.toaddrs, ","), self.subject)
                 for record in self.buffer:
                     s = self.format(record)
                     msg = msg + s + "\r\n"
-                smtp.sendmail(self.fromaddr, self.toaddrs, msg)
-                smtp.quit()
+                request_url = 'https://api.mailgun.net/v2/{0}/messages'.format(domain)
+                request = requests.post(request_url, auth=('api', key), data={
+                    'from': self.fromaddr,
+                    'to': string.join(self.toaddrs, ","),
+                    'subject': subject,
+                    'text': msg
+                })
             except:
                 self.handleError(None)  # no particular record
             self.buffer = []
@@ -336,10 +338,10 @@ def configure_log(logdir=logdir,level=logging.WARNING,name=None):
     config = ConfigReader()
     alertemails = config.get('logging','error_alertemails')
     if len(alertemails) > 0:
-        smtpHandler = BufferingSMTPHandler(
+        smtpHandler = BufferingMailgunHandler(
             toaddrs=alertemails,
             fromaddr=config.get('logging','error_fromaddr'),
-            smtpconfig=config.get('logging','smtpconfig'),
+            mailgunconfig=config.get('logging','mailgunconfig'),
             subject="Error in OFTMatrix",
             capacity=10)
         smtpHandler.setFormatter(mainLogFormatter)
